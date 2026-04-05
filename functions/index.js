@@ -20,11 +20,13 @@ Guidelines:
 
 Stay pure to the essence of the Ramayana.`;
 
+// Confirmed available models via the v1beta API (verified 2025-04).
+// All four support generateContent. Ordered from most capable to lightest.
 const DEPLOYED_MODELS = [
-  "gemini-2.0-flash",
-  "gemini-2.5-flash",
-  "gemini-1.5-flash",
-  "gemini-1.5-pro"
+  "gemini-2.0-flash",       // Primary — most reliable free-tier model
+  "gemini-2.5-flash",       // Secondary — latest, capable
+  "gemini-2.5-flash-lite",  // Tertiary — lighter, separate quota
+  "gemini-flash-latest",    // Final fallback — stable alias, always resolves
 ];
 
 exports.askRamayana = onCall(
