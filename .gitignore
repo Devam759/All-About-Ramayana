@@ -29,7 +29,6 @@ dist-ssr
 .env.local
 serviceAccountKey.json
 all-about-ramayana-firebase-adminsdk-fbsvc-bca76f25ee.json
-*.json
 firebase-debug.log
 .firebase/
 

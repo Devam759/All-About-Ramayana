@@ -10,19 +10,21 @@ function Header({ isDarkMode, toggleDarkMode }) {
       background: 'transparent' 
     }}>
       <div className="logo" style={{ 
-        fontSize: '1.5rem', 
-        fontWeight: 'bold', 
-        fontFamily: 'Playfair Display', 
+        fontSize: '1.4rem', 
+        fontWeight: '700', 
+        fontFamily: "'Gupter', serif", 
         color: 'var(--primary)',
-        letterSpacing: '1px'
+        letterSpacing: '1px',
+        textTransform: 'uppercase'
       }}>
-        All About Ramayana
+        ALL ABOUT RAMAYANA
       </div>
+
+
+
+
       
       <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-        <a href="#about" className="header-nav-link" style={{ textDecoration: 'none', color: 'inherit', fontSize: '0.9rem', fontWeight: 600 }}>ABOUT</a>
-        <a href="#resources" className="header-nav-link" style={{ textDecoration: 'none', color: 'inherit', fontSize: '0.9rem', fontWeight: 600 }}>RESOURCES</a>
-        
         <button 
           onClick={toggleDarkMode}
           className={`theme-toggle-premium ${isDarkMode ? 'dark' : 'light'}`}

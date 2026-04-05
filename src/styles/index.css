@@ -14,7 +14,13 @@
 html, body, #root {
   height: 100%;
   overflow: hidden;
+  box-sizing: border-box;
 }
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -39,6 +45,24 @@ h1, h2, h3, h4, .scripture-text {
   transition: background-color 0.6s ease;
   overflow: hidden; /* Enforce fixed height */
 }
+
+.main-content-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-height: 0; /* Important for flex children to scroll */
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+
 
 /* Cinematic Cross-Fade Background Overlay */
 .app-container::before {
@@ -307,21 +331,31 @@ body.dark-mode .theme-toggle-premium:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Containers shouldn't scroll, only the message list */
+  overflow: hidden;
   width: 100%;
   margin: 0 auto;
   position: relative;
+  min-height: 0; /* Crucial for flexbox scrolling */
 }
 
 .message-list {
   flex: 1;
-  padding: 2rem 1.5rem 8rem; /* Extra bottom padding for floating input */
+  padding: 1.5rem 1.5rem 7rem; /* Reduced from 12rem to 7rem for better density */
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.2rem; /* Tighter gap */
   scroll-behavior: smooth;
+  position: relative;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+
+  /* Add a gradient mask at the bottom to prevent text from abruptly cutting off */
+  mask-image: linear-gradient(to bottom, black 85%, transparent 98%);
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 98%);
 }
+
 
 /* Custom Scrollbar for Divine Feel */
 .message-list::-webkit-scrollbar {
@@ -377,21 +411,56 @@ body.dark-mode .message.ai {
   cursor: pointer;
 }
 
-.input-area {
+.chat-bottom-container {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 0;
-  right: 0;
   width: 100%;
   display: flex;
-  justify-content: center;
-  padding: 1.5rem 2rem 2.5rem;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 0.8rem;
+  background: linear-gradient(to top, var(--bg-primary) 40%, transparent);
   pointer-events: none;
-  z-index: 100;
+  z-index: 1000;
 }
+
+.input-area {
+  display: flex;
+  justify-content: center;
+  padding: 0 2rem;
+  width: 100%;
+  pointer-events: none;
+}
+
+.privacy-note {
+  font-size: 0.72rem;
+  color: rgba(145, 114, 53, 0.9); /* Increased contrast */
+  text-align: center;
+  margin-top: 8px;
+  font-style: italic;
+  width: 100%;
+  pointer-events: auto; /* Ensure link is clickable */
+}
+
+@media (max-width: 600px) {
+  .chat-bottom-container {
+    padding-bottom: 0.5rem;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .input-area {
+    padding: 1rem 0.8rem 1.5rem;
+  }
+  
+  .chat-input-pill {
+    padding: 0.5rem 1rem;
+    gap: 0.25rem;
+  }
+}
+
 
 .chat-input-pill {
   pointer-events: auto;
@@ -403,21 +472,27 @@ body.dark-mode .message.ai {
   padding: 0.6rem 1.2rem;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(212, 175, 55, 0.2);
+  border: 1.5px solid rgba(0, 0, 0, 0.05); /* Very subtle neutral border */
   border-radius: 100px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.08); /* Deep, clean shadow */
   transition: var(--transition-smooth);
 }
 
 .chat-input-pill:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 10px 40px rgba(255, 153, 51, 0.15);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.12);
 }
 
 body.dark-mode .chat-input-pill {
-  background: rgba(30, 30, 30, 0.8);
-  border-color: rgba(212, 175, 55, 0.15);
+  background: rgba(30, 30, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 60px rgba(0, 0, 0, 0.5);
 }
+
+body.dark-mode .chat-input-pill:focus-within {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 
 .chat-input {
   flex: 1;
@@ -550,4 +625,212 @@ body.dark-mode .footer-nav-link {
 
 body.dark-mode .footer-nav-link:hover {
   color: white;
+}
+
+.privacy-note {
+  font-size: 0.72rem;
+  color: rgba(145, 114, 53, 0.65);
+  text-align: center;
+  margin-top: 12px;
+  font-style: italic;
+  width: 100%;
+}
+
+.privacy-link {
+  background: none;
+  border: none;
+  color: #917235;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  font-weight: 501;
+  transition: opacity 0.2s;
+}
+
+.privacy-link:hover {
+  opacity: 0.8;
+}
+
+/* --- Modal Design System (Professional Refinement) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 5, 2, 0.94); /* Slightly deeper focus */
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content.royal-card {
+  background: var(--bg-primary);
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 0; 
+  max-width: 600px; 
+  width: 95%;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 120px rgba(212,175,55,0.1);
+  max-height: 88vh;
+  overflow: hidden; 
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 3rem 2.5rem 1.5rem;
+  border-bottom: 1px solid rgba(145, 114, 53, 0.1);
+  background: linear-gradient(to bottom, rgba(145,114,53,0.08), transparent);
+}
+
+.modal-title {
+  font-family: 'Playfair Display', serif; /* Correct Site Theme Hook */
+  color: var(--secondary);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  border: none;
+}
+
+.modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  opacity: 0.8;
+  margin-top: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 1.5rem 2.5rem 2.5rem;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) transparent;
+}
+
+.modal-section {
+  margin-bottom: 2rem;
+}
+
+.section-heading {
+  font-family: 'Playfair Display', serif; /* Consistent with site H3 */
+  font-size: 1.15rem;
+  color: var(--secondary);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-heading::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(to right, rgba(145, 114, 53, 0.3), transparent);
+}
+
+.modal-section p {
+  font-family: 'Inter', sans-serif; /* Consistent with site body */
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.policy-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.2rem;
+}
+
+.policy-list li {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  padding-left: 1.8rem;
+  position: relative;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.policy-list li::before {
+  content: '✦'; /* More professional star-like bullet */
+  position: absolute;
+  left: 0;
+  color: var(--primary); /* Deep Saffron */
+  font-size: 0.9rem;
+  top: 0;
+}
+
+.external-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1.5px solid rgba(255, 153, 51, 0.4);
+  transition: all 0.2s;
+}
+
+.external-link:hover {
+  border-bottom-color: var(--primary);
+  color: var(--secondary);
+}
+
+.modal-footer-professional {
+  padding: 2rem 2.5rem;
+  background: rgba(10, 5, 2, 0.4);
+  border-top: 1px solid rgba(145, 114, 53, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.disclaimer-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  text-align: center;
+  opacity: 0.6;
+  font-style: italic;
+  max-width: 90%;
+  letter-spacing: 0.02em;
+}
+
+.btn-royal-solid {
+  background: linear-gradient(135deg, var(--primary), #e68a00);
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  border-radius: 50px; /* Pill shape for modern professional look */
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.btn-royal-solid:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 8px 30px rgba(255, 153, 51, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

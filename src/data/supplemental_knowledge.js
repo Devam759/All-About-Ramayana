@@ -1,5 +1,3 @@
-export const SUPPLEMENTAL_KNOWLEDGE = `
-[NO SUPPLEMENTAL KNOWLEDGE YET]
-Searching for Divine Wisdom...
-Run 'npm run train' to synthesize new knowledge from user searches.
-`;
+export const SUPPLEMENTAL_KNOWLEDGE = `Lakshmana was one of the four illustrious sons of King Dasaratha of Ayodhya, the capital of the Kosala kingdom. His birth, along with his brothers, was a direct result of the Putrakameshti Yajna (sacrifice for progeny) performed by King Dasaratha. After the completion of this grand ritual, a celestial being emerged from the sacrificial fire, bearing a divine vessel filled with payasam (nectar). King Dasaratha distributed this sacred offering among his three queens.
+
+Lakshmana was born to Queen Sumitra, who also gave birth to his twin brother, Shatrughna. Thus, Lakshmana is the son of Sumitra. He was born in the royal palace in Ayodhya, following the births of Rama (son of Kaushalya) and Bharata (son of Kaikeyi). From his very birth, Lakshmana displayed an inseparable bond with Rama, a devotion that would define his entire life. The four princes grew up together in Ayodhya, receiving education and training befitting their royal lineage.`;

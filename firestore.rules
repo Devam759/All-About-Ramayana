@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // user_queries: Strict validation to prevent spam and data poisoning
+    match /user_queries/{queryId} {
+
+      // Allow create only if ALL of these conditions are met:
+      allow create: if
+        // 1. The document has exactly the expected fields (no extra junk fields)
+        request.resource.data.keys().hasOnly(['text', 'language', 'platform', 'timestamp'])
+
+        // 2. 'text' must be a non-empty string under 1000 characters
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() < 1000
+
+        // 3. 'timestamp' must be the exact server time (no backdating/spoofing)
+        && request.resource.data.timestamp == request.time
+
+        // 4. 'platform' must be a known value
+        && request.resource.data.platform in ['web', 'android', 'ios']
+
+        // 5. 'language' must be a short string (prevents storing large payloads in metadata)
+        && request.resource.data.language is string
+        && request.resource.data.language.size() < 30;
+
+      // Nobody can read, update, or delete query logs from the client
+      allow read, update, delete: if false;
+    }
+
+    // All other collections are completely locked down
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}
+

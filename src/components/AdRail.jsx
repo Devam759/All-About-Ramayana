@@ -8,13 +8,25 @@ function AdRail({ side }) {
   const slotId = side === 'left' ? LEFT_SLOT : RIGHT_SLOT;
 
   useEffect(() => {
+    // Skip if using placeholder IDs to avoid 400 errors and console noise
+    const isPlaceholder = !ADSENSE_CLIENT || 
+                         ADSENSE_CLIENT.includes('1234567890') || 
+                         slotId === '1234567890' || 
+                         slotId === '0987654321';
+    
+    if (isPlaceholder) return;
+
     try {
-      // Trigger Google Ads push for this specific unit
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      const ads = window.adsbygoogle || [];
+      ads.push({});
     } catch (err) {
-      console.warn('AdSense push failed, likely due to ad blocker or dev mode:', err.message);
+      // Quietly handle errors as they're commonly caused by ad-blockers or re-renders
+      if (!err.message?.includes('already have ads')) {
+        console.warn('AdSense check:', err.message);
+      }
     }
-  }, [side]);
+  }, [slotId]);
+
 
   return (
     <aside className={`ad-rail ${side}-rail`}>
