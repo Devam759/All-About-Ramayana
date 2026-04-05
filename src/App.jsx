@@ -1,18 +1,41 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import ChatInterface from './components/ChatInterface'
 import Header from './components/Header'
+import AdRail from './components/AdRail'
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check local storage first, then fall back to system preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  })
 
-  // Toggle dark mode
+  // Toggle dark mode and save to localStorage
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add('dark-mode')
+      localStorage.setItem('theme', 'dark')
     } else {
       document.body.classList.remove('dark-mode')
+      localStorage.setItem('theme', 'light')
     }
   }, [isDarkMode])
+
+  // Listen for system theme changes
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => {
+      // Only auto-switch if the user hasn't set a manual preference 
+      // (Simplified: if no choice made in this session, match the latest preference)
+      setIsDarkMode(e.matches);
+    };
+
+    query.addEventListener('change', handleChange);
+    return () => query.removeEventListener('change', handleChange);
+  }, [])
 
   return (
     <div className="app-container">
@@ -21,33 +44,17 @@ function App() {
         toggleDarkMode={() => setIsDarkMode(!isDarkMode)} 
       />
       
-      <main className="fade-in">
-        <section className="hero-section" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', color: 'var(--primary)' }}>
-            All About Ramayana
-          </h1>
-          <p style={{ fontSize: '1.2rem', maxWidth: '700px', margin: '0 auto', opacity: 0.8 }}>
-            Ask anything about the eternal epic of Lord Rama. Answers are derived directly from the Valmiki Ramayana in Sanskrit and English.
-          </p>
-        </section>
+      <div className="main-content-layout">
+        {/* Left Side Ad Rail (Desktop Only) */}
+        <AdRail side="left" />
 
-        <section className="chat-window-section">
+        <main className="fade-in">
           <ChatInterface />
-        </section>
-        
-        {/* AdSense Placeholder */}
-        <div className="ads-container" style={{ textAlign: 'center', margin: '2rem 0', padding: '1rem', border: '1px dashed #ccc' }}>
-          <p style={{ fontSize: '0.8rem', color: '#888' }}>Advertisement</p>
-          {/* AdSense script code would go here */}
-          <div style={{ minHeight: '90px', background: '#f9f9f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#bbb' }}>Google Ads Placeholder</span>
-          </div>
-        </div>
-      </main>
+        </main>
 
-      <footer style={{ padding: '2rem', textAlign: 'center', fontSize: '0.9rem', opacity: 0.6 }}>
-        <p>© 2026 All About Ramayana. Built with devotion.</p>
-      </footer>
+        {/* Right Side Ad Rail (Desktop Only) */}
+        <AdRail side="right" />
+      </div>
     </div>
   )
 }

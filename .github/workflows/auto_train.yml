@@ -1,0 +1,48 @@
+name: Divine Auto-Update
+
+on:
+  schedule:
+    - cron: '0 0 */10 * *' # Every 10 days at midnight
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  train-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Divine Training
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+        run: npm run train
+
+      - name: Commit Updated Knowledge
+        run: |
+          git config --global user.name "Divine-Bot"
+          git config --global user.email "bot@all-about-ramayana.com"
+          git add src/data/supplemental_knowledge.js
+          git commit -m "chore: automated divine knowledge update [skip ci]" || echo "No changes to commit"
+          git push origin main
+
+      - name: Build and Deploy to Firebase
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_ADSENSE_CLIENT_ID: ${{ secrets.VITE_ADSENSE_CLIENT_ID }}
+          VITE_ADSENSE_LEFT_SLOT_ID: ${{ secrets.VITE_ADSENSE_LEFT_SLOT_ID }}
+          VITE_ADSENSE_RIGHT_SLOT_ID: ${{ secrets.VITE_ADSENSE_RIGHT_SLOT_ID }}
+        run: |
+          npm run build
+          npx firebase-tools deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}"

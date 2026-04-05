@@ -27,6 +27,11 @@ dist-ssr
 .env
 .env.production
 .env.local
+serviceAccountKey.json
+all-about-ramayana-firebase-adminsdk-fbsvc-bca76f25ee.json
+*.json
+firebase-debug.log
+.firebase/
 
 # Build outputs
 build/

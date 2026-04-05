@@ -1,53 +1,62 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { RAMAYANA_TEXT } from "../data/ramayana_text";
+import { SUPPLEMENTAL_KNOWLEDGE } from "../data/supplemental_knowledge";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
+
+// New unified SDK (2026 standard)
+const ai = new GoogleGenAI({
+  apiKey: API_KEY,
+});
 
 const SYSTEM_PROMPT = `
-You are the "Divine Ramayana Guide", a specialized AI assistant that provides answers about the Valmiki Ramayana based ONLY on the provided text.
+You are the "Divine Ramayana Guide", a specialized AI assistant that provides DIRECT answers about the Valmiki Ramayana based ONLY on the provided text and supplemental knowledge.
 
-RULES:
-1. Use the provided "RAMAYANA_TEXT" as your only source of truth.
-2. CITATION: For every answer, provide the Kanda and Section/Chapter reference (e.g., Bala Kanda, Chapter I).
-3. If the answer is not in the text, say: "My apologies, this specific detail is not mentioned in the Valmiki Ramayana text I have. I can only provide answers based on traditional Valmiki Ramayana."
-4. LANGUAGE: Respond in the same language as the user (Hindi, English, or Hinglish).
-5. TONE: Maintain a respectful, "Divine Minimalism" tone. Be concise but deep and insightful.
-6. FORMAT: Use clean markdown. Mention the specific quote if relevant.
+CORE KNOWLEDGE BASE:
+${RAMAYANA_TEXT}
+
+SUPPLEMENTAL DIVINE WISDOM:
+${SUPPLEMENTAL_KNOWLEDGE}
+
+STRICT BEHAVIOR RULES:
+1. **CONTEXTUAL CONTINUITY**: You MUST use the conversation history to understand follow-up questions. For example, if a user asks "Kumbhkaran ki height?" and then "km me batao", you must know "km me batao" refers to Kumbhkaran's height.
+2. **STRICT LANGUAGE MIRRORING**: You MUST respond in the EXACT script and style as the user:
+   - **Hinglish (Roman Hindi)**: If asked "Ram kaun the?", respond in Hinglish: "Ram Dashrath ke sabse bade bete the..."
+   - **Devanagari Hindi**: If asked "राम कौन थे?", respond in Hindi: "राम दशरथ के सबसे बड़े पुत्र थे..."
+   - **English**: If asked "Who was Ram?", respond in English: "Ram was the eldest son of Dashratha..."
+3. **DIRECTNESS**: No introductory fluff ("According to the text...", "Sure!", "Namaste"). Start the answer immediately.
+4. **KUMBHAKARNA'S HEIGHT**: The text describes him as "mountain-like" (vidhyanchal mountain). If asked in 'km', translate "mountain-like" to a massive scale (~1.5km to 2km) while citing his "mountain-like" description.
+5. **CITATION**: Always provide the Kanda/Chapter reference at the end in brackets.
 
 CONTEXT:
-${RAMAYANA_TEXT.substring(0, 50000)} 
-... (The full 435KB text is available for your processing. Please focus on the user's specific query within the Valmiki Ramayana context.)
+${RAMAYANA_TEXT}
 `;
 
-// Note: For Gemini 1.5 Pro, we can actually pass the full text as part of the system instruction.
-// Since the text is ~110k tokens, it fits perfectly.
-
-export async function askRamayana(userQuery) {
+export async function askRamayana(userQuery, history = []) {
   if (!API_KEY) {
     throw new Error("Gemini API Key is missing. Please add it to your .env file as VITE_GEMINI_API_KEY.");
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    // We bundle the context in the system instruction for grounding
-    const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: "System Instructions: " + SYSTEM_PROMPT }],
-        },
-        {
-          role: "model",
-          parts: [{ text: "I understand. I am the Divine Ramayana Guide. I will answer based on the Valmiki Ramayana text provided. What is your question?" }],
-        },
-      ],
+    // Map history to Gemini's expected format: [{ role: 'user'|'model', parts: [{ text: '...' }] }]
+    const contents = history.map(msg => ({
+      role: msg.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }]
+    }));
+
+    // Add the current query
+    contents.push({
+      role: "user",
+      parts: [{ text: userQuery }]
     });
 
-    const result = await chat.sendMessage(userQuery);
-    const response = await result.response;
-    return response.text();
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      systemInstruction: SYSTEM_PROMPT,
+      contents: contents, // Full context sent here
+    });
+
+    return response.text;
   } catch (error) {
     console.error("Gemini API Error:", error);
     throw error;

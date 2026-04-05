@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://all-about-ramayana.web.app/sitemap.xml
