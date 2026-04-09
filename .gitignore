@@ -1,3 +1,49 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Production / Build Artifacts
+dist
+dist-ssr
+build
+out
+.next
+.cache
+.vite-inspect
+.vercel
+
+# Firebase
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+*-firebase-adminsdk-*.json
+serviceAccountKey.json
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.local
+*.secret
+*.pem
+
+# Editor / OS Assets
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 # Logs
 logs
 *.log
@@ -7,36 +53,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Environment variables
-.env
-.env.production
-.env.local
-serviceAccountKey.json
-all-about-ramayana-firebase-adminsdk-fbsvc-bca76f25ee.json
-firebase-debug.log
-.firebase/
-
-# Build outputs
-build/
-out/
-.next/
-.cache/
-
-# React
-src/assets/
+# Misc
+.cache
+.eslintcache
+.stylelintcache

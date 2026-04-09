@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { askRamayana } from '../lib/gemini'
-import { logQuery } from '../lib/firebase'
-import PrivacyModal from './PrivacyModal'
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import { askRamayana } from '../lib/gemini';
+import { logQuery } from '../lib/firebase';
+import PrivacyModal from './PrivacyModal';
 
 function ChatInterface() {
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false)
   const [error, setError] = useState(null)
   const [lastMessageTime, setLastMessageTime] = useState(0)
@@ -20,6 +21,13 @@ function ChatInterface() {
   }
 
   useEffect(scrollToBottom, [messages, isTyping])
+
+  // Listener for the Cookie Consent banner to open the modal
+  useEffect(() => {
+    const handleOpenModal = () => setShowPrivacy(true);
+    window.addEventListener('open-privacy-modal', handleOpenModal);
+    return () => window.removeEventListener('open-privacy-modal', handleOpenModal);
+  }, []);
 
   const sanitizeQuery = (rawInput) => {
     // 1. Trim and length limit (1000 characters to prevent resource exhaustion)
@@ -187,7 +195,7 @@ function ChatInterface() {
         </form>
 
         <p className="privacy-note">
-          By chatting, you agree to help us refine the Divine Guide. Review our <button className="privacy-link" onClick={() => setShowPrivacy(true)}>Privacy & Data Conduct</button>.
+          By chatting, you agree to help us refine the Divine Guide. Review our <Link to="/privacy" className="privacy-link">Privacy & Data Conduct</Link>.
         </p>
       </div>
 
@@ -199,7 +207,6 @@ function ChatInterface() {
       {!hasStarted && (
         <div className="empty-footer-placeholder" />
       )}
-
     </div>
   )
 }

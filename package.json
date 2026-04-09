@@ -10,7 +10,6 @@
     "train": "node scripts/divine_train.js",
     "deploy": "npm run build && npx firebase-tools deploy"
   },
-
   "dependencies": {
     "@google/genai": "^1.48.0",
     "axios": "^1.7.9",
@@ -20,7 +19,8 @@
     "lucide-react": "^0.300.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.14.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ChatInterface from './components/ChatInterface'
 import Header from './components/Header'
 import AdRail from './components/AdRail'
+import CookieConsent from './components/CookieConsent'
+import AboutPage from './components/AboutPage'
+import PrivacyPage from './components/PrivacyPage'
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -38,24 +42,33 @@ function App() {
   }, [])
 
   return (
-    <div className="app-container">
-      <Header 
-        isDarkMode={isDarkMode} 
-        toggleDarkMode={() => setIsDarkMode(!isDarkMode)} 
-      />
-      
-      <div className="main-content-layout">
-        {/* Left Side Ad Rail (Desktop Only) */}
-        <AdRail side="left" />
+    <Router>
+      <div className="app-container">
+        <Header 
+          isDarkMode={isDarkMode} 
+          toggleDarkMode={() => setIsDarkMode(!isDarkMode)} 
+        />
+        
+        <Routes>
+          {/* Main Chat Route */}
+          <Route path="/" element={
+            <div className="main-content-layout">
+              <AdRail side="left" />
+              <main className="fade-in">
+                <ChatInterface />
+              </main>
+              <AdRail side="right" />
+            </div>
+          } />
 
-        <main className="fade-in">
-          <ChatInterface />
-        </main>
+          {/* Standalone Content Routes */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+        </Routes>
 
-        {/* Right Side Ad Rail (Desktop Only) */}
-        <AdRail side="right" />
+        <CookieConsent />
       </div>
-    </div>
+    </Router>
   )
 }
 
