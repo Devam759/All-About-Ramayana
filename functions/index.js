@@ -107,15 +107,13 @@ exports.askRamayana = onCall(
 
   for (const modelName of DEPLOYED_MODELS) {
     try {
-      // Use the standard getGenerativeModel pattern to ensure System Instructions are respected.
-      const model = ai.getGenerativeModel({ 
+      const response = await ai.models.generateContent({ 
         model: modelName,
-        systemInstruction: SYSTEM_PROMPT 
+        contents: contents,
+        config: { systemInstruction: SYSTEM_PROMPT }
       });
 
-      const result = await model.generateContent({ contents });
-      const response = await result.response;
-      const responseText = response.text();
+      const responseText = response.text;
 
       if (responseText) {
         return { text: responseText };
